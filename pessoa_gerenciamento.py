@@ -8,14 +8,58 @@ class Pessoa:
         return f"Nome: {self.nome}, Telefone: {self.telefone}, Sexo: {self.sexo}"
 
 
+class Aluno(Pessoa):
+    def __init__(self, nome, telefone, sexo, id_aluno, altura, idade, peso):
+        super().__init__(nome, telefone, sexo)
+        self.id_aluno = id_aluno
+        self.altura = altura
+        self.idade = idade
+        self.peso = peso
+        self.imc = self.calcular_imc()
+        self.treinos = [] #lista que armazena os treinos do aluno
+        self.progresso = [] #lista que armazena o progresso do aluno
+
+    def calcular_imc(self):
+        return round(self.peso / (self.altura ** 2), 2)
+    
+    def adicionar_treino(self, treino):
+        self.treinos.append(treino)
+        print(f"Treino {treino.nome} adicionado ao aluno {self.nome}.")
+        
+    def listar_treinos(self):
+        print(f"Treinos do aluno {self.nome}:")
+        for treino in self.treinos:
+            print(f"- {treino.nome} ({treino.grupo_muscular}, {treino.dificuldade}, {treino.qnt_exercicios} exercícios)")
+            
+    def adicionar_progresso(self, progresso):
+        self.progresso.append(progresso)
+        print(f"Progresso do dia {progresso.data} adicionado ao aluno {self.nome}.")
+    
+    def listar_processo(self):
+        print(f"Progresso do aluno {self.nome}:")
+        for prog in self.progresso:
+            print(f"- Data: {prog.data}, Peso: {prog.peso}kg")
+
+    def __str__(self):
+        return (f"{super().__str__()}, ID Aluno: {self.id_aluno}, Altura: {self.altura}m, "
+                f"Idade: {self.idade}, Peso: {self.peso}kg, IMC: {self.imc}")
+class Personal(Pessoa):
+    def __init__(self, nome, telefone, sexo, cref):
+        super().__init__(nome, telefone, sexo)
+        self.cref = cref
+
+    def __str__(self):
+        return f"{super().__str__()}, CREF: {self.cref}"
+
+
 class SistemaCadastro:
     def __init__(self):
         self.pessoas = []
-        self.total_cadastradas = 0  # Adiciona um contador de pessoas cadastradas
+        self.total_cadastradas = 0
 
     def inserir(self, pessoa):
         self.pessoas.append(pessoa)
-        self.total_cadastradas += 1  # Incrementa o contador
+        self.total_cadastradas += 1
         print(f"\nUsuário {pessoa.nome} inserido com sucesso!")
 
     def alterar(self, nome):
@@ -40,7 +84,7 @@ class SistemaCadastro:
         for pessoa in self.pessoas:
             if pessoa.nome == nome:
                 self.pessoas.remove(pessoa)
-                self.total_cadastradas -= 1  # Decrementa o contador
+                self.total_cadastradas -= 1
                 print(f"\nPessoa {nome} removida com sucesso!")
                 return
         print(f"\nPessoa com nome {nome} não encontrada.")
@@ -90,7 +134,21 @@ def menu():
             nome = input("Nome: ")
             telefone = input("Telefone: ")
             sexo = sistema.validar_sexo(input("Sexo (M/F): "))
-            pessoa = Pessoa(nome, telefone, sexo)
+
+            tipo_pessoa = input("A pessoa é um aluno ou um personal? (Digite 'aluno' ou 'personal'): ").strip().lower()
+            if tipo_pessoa == 'aluno':
+                id_aluno = input("ID do Aluno: ")
+                altura = float(input("Altura (em metros): "))
+                idade = int(input("Idade: "))
+                peso = float(input("Peso (em kg): "))
+                pessoa = Aluno(nome, telefone, sexo, id_aluno, altura, idade, peso)
+            elif tipo_pessoa == 'personal':
+                cref = input("CREF: ")
+                pessoa = Personal(nome, telefone, sexo, cref)
+            else:
+                print("Tipo inválido, operação cancelada.")
+                continue
+
             sistema.inserir(pessoa)
 
         elif opcao == '2':
@@ -114,7 +172,7 @@ def menu():
 
         elif opcao == '0':
             print("\nSaindo do sistema...")
-            sistema.relatorio_final()  # Exibe o relatório final ao sair
+            sistema.relatorio_final()
             break
 
         else:

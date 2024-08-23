@@ -6,3 +6,7 @@ class Treino:
         self.qnt_exercicios = qnt_exercicios
         self.id_aluino = id_aluno
         
+    def __str__(self):
+        return (f"Treino: {self.nome}, Grupo Muscular: {self.grupo_muscular}, "
+                f"Dificuldade: {self.dificuldade}, Exercícios: {self.qnt_exercicios}, "
+                f"ID do Aluno: {self.id_aluno}")
