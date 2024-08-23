@@ -3,5 +3,5 @@ class Progresso:
         self.data = data
         self.peso = peso
         
-    def __str__(self) -> str:
+    def __str__(self):
         return f"Data: {self.data}, Peso: {self.peso}kg"
