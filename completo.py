@@ -171,8 +171,25 @@ class SistemaCadastro:
         return sexo.upper()
 
     def relatorio_final(self):
+        alunos = [p for p in self.pessoas if isinstance(p, Aluno)]
+        personais = [p for p in self.pessoas if isinstance(p, Personal)]
+        
         print(f"\nRelatório Final:")
         print(f"Total de pessoas cadastradas: {self.total_cadastradas}")
+        
+        print("\nAlunos Cadastrados:")
+        if alunos:
+            for aluno in alunos:
+                print(f"ID: {aluno.id}, Nome: {aluno.nome}, Sexo: {aluno.sexo}, Telefone: {aluno.telefone}, Matrícula: {aluno.matricula}")
+        else:
+            print("Nenhum aluno cadastrado.")
+
+        print("\nPersonais Cadastrados:")
+        if personais:
+            for personal in personais:
+                print(f"ID: {personal.id}, Nome: {personal.nome}, Sexo: {personal.sexo}, Telefone: {personal.telefone}, CREF: {personal.cref}")
+        else:
+            print("Nenhum personal cadastrado.")
 
 
 def menu():
