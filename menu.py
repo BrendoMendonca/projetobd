@@ -1,5 +1,7 @@
+
 from sistema_cadastro import SistemaCadastro
 from usuarios import Aluno, Personal
+from treino_progresso import Progresso, Treino
 
 def menu():
     sistema = SistemaCadastro()
@@ -41,16 +43,16 @@ def menu():
             sistema.inserir(pessoa)
 
         elif opcao == '2':
-            id = int(input("Digite o ID da pessoa a ser alterada: "))
-            sistema.alterar(id)
+            #id = int(input("Digite o ID da pessoa a ser alterada: "))
+            sistema.alterar()
 
         elif opcao == '3':
             nome = input("Digite o nome da pessoa a ser pesquisada: ")
             sistema.pesquisar(nome)
 
         elif opcao == '4':
-            id = int(input("Digite o ID da pessoa a ser removida: "))
-            sistema.remover(id)
+            #id = int(input("Digite o ID da pessoa a ser removida: "))
+            sistema.remover()
 
         elif opcao == '5':
             sistema.listar_todos()
@@ -59,7 +61,7 @@ def menu():
             id = int(input("Digite o ID da pessoa a ser exibida: "))
             sistema.exibir_um(id)
 
-        elif opcao == '7':
+        elif opcao == '7':  #adiciona treino a aluno
             matricula = input("Digite a matrícula do aluno para adicionar um treino: ")
             aluno = next((p for p in sistema.pessoas if isinstance(p, Aluno) and p.matricula == matricula), None)
             if aluno:
@@ -67,15 +69,22 @@ def menu():
                 grupo_muscular = input("Grupo muscular: ")
                 dificuldade = input("Dificuldade: ")
                 qnt_exercicios = int(input("Quantidade de exercícios: "))
-                sistema.treino.adicionar_treino(aluno, nome_treino, grupo_muscular, dificuldade, qnt_exercicios)
+                
+                #cria uma instância de Treino passando os argumentos necessários
+                treino = Treino(nome_treino, grupo_muscular, dificuldade, qnt_exercicios, matricula)
+                
+                treino.salvar_no_banco(aluno.id)  # Salva o treino no banco de dados
+                aluno.treinos.append(treino)
+                
+                print("Treino adicionado com sucesso.")
             else:
                 print(f"Aluno com matrícula {matricula} não encontrado.")
 
-        elif opcao == '8':
+        elif opcao == '8':  #lista treinos de aluno
             matricula = input("Digite a matrícula do aluno para listar os treinos: ")
             aluno = next((p for p in sistema.pessoas if isinstance(p, Aluno) and p.matricula == matricula), None)
             if aluno:
-                sistema.treino.listar_treinos(aluno)
+                Treino.listar_treinos(aluno)
             else:
                 print(f"Aluno com matrícula {matricula} não encontrado.")
 
@@ -86,17 +95,22 @@ def menu():
                 data = input("Data (dd/mm/aaaa): ")
                 peso = float(input("Peso (em kg): "))
                 try:
-                    sistema.progresso.adicionar_progresso(aluno, data, peso)
+                    progresso = Progresso(data, peso, aluno.altura)
+                    
+                    progresso.salvar_no_banco(aluno.id)  #salva o progresso no banco de dados
+                    aluno.adicionar_progresso(progresso)
+                    
+                    print(f"Progresso adicionado com sucesso.")
                 except ValueError as e:
                     print(e)
             else:
                 print(f"Aluno com matrícula {matricula} não encontrado.")
 
-        elif opcao == '10':
+        elif opcao == '10':  #listar progresso de aluno
             matricula = input("Digite a matrícula do aluno para listar o progresso: ")
             aluno = next((p for p in sistema.pessoas if isinstance(p, Aluno) and p.matricula == matricula), None)
             if aluno:
-                sistema.progresso.listar_progresso(aluno)
+                Progresso.listar_progresso(aluno) 
             else:
                 print(f"Aluno com matrícula {matricula} não encontrado.")
 

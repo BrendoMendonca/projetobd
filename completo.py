@@ -70,6 +70,8 @@ class Aluno(Pessoa):
     def __str__(self):
         return (f"{super().__str__()}, Matricula: {self.matricula}, Altura: {self.altura}m, "
                 f"Idade: {self.idade}, Peso: {self.peso}kg, IMC: {self.imc}")
+    
+    
 class Personal(Pessoa):
     def __init__(self, nome, telefone, sexo, cref):
         super().__init__(nome, telefone, sexo, None)  # Passa None para o id, será atribuído no método inserir
