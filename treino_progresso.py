@@ -55,19 +55,22 @@ class Progresso:
 
 
 class Treino:
-    def __init__(self, nome, grupo_muscular, dificuldade, qnt_exercicios, matricula):
+    def __init__(self, nome, grupo_muscular, dificuldade, qnt_exercicios, matricula, valor, cref_responsavel, pagamento):
         self.nome = nome
         self.grupo_muscular = grupo_muscular
         self.dificuldade = dificuldade
         self.qnt_exercicios = qnt_exercicios
         self.matricula = matricula
+        self.valor = valor
+        self.cref_responsavel = cref_responsavel
+        self.pagamento = pagamento
 
     def listar_treinos(aluno):
         conn = conectar_banco()
         cursor = conn.cursor()
         
-        cursor.execute('''SELECT nome, grupo_muscular, dificuldade, qnt_exercicios 
-                          FROM treinos WHERE aluno_id = %s''', (aluno.id,))
+        cursor.execute('''SELECT nome, grupo_muscular, dificuldade, qnt_exercicios, valor, cref_responsavel, pagamento
+                      FROM treinos WHERE aluno_id = %s''', (aluno.id,))
         treinos = cursor.fetchall()
 
         conn.close()
@@ -75,7 +78,8 @@ class Treino:
         if treinos:
             print(f"Treinos do aluno {aluno.nome} - {aluno.matricula}:")
             for treino in treinos:
-                print(f"- {treino[0]} ({treino[1]}, {treino[2]}, {treino[3]} exercícios)")
+                print(f"- {treino[0]} ({treino[1]}, {treino[2]}, {treino[3]} exercícios) - "
+                    f"Valor: R$ {treino[4]}, CREF Responsável: {treino[5]}, Forma de Pagamento: {treino[6]}")
         else:
             print(f"Não há treinos registrados para o aluno {aluno.nome}.")
 
@@ -83,14 +87,15 @@ class Treino:
         conn = conectar_banco()
         cursor = conn.cursor()
         
-        cursor.execute('''INSERT INTO treinos (aluno_id, nome, grupo_muscular, dificuldade, qnt_exercicios) 
-                          VALUES (%s, %s, %s, %s, %s)''',
-                       (aluno_id, self.nome, self.grupo_muscular, self.dificuldade, self.qnt_exercicios))
+        cursor.execute('''INSERT INTO treinos (aluno_id, nome, grupo_muscular, dificuldade, qnt_exercicios, valor, cref_responsavel, pagamento) 
+                          VALUES (%s, %s, %s, %s, %s, %s, %s, %s)''',
+                       (aluno_id, self.nome, self.grupo_muscular, self.dificuldade, self.qnt_exercicios, 
+                        self.valor, self.cref_responsavel, self.pagamento))
         
         conn.commit()
         conn.close()
 
     def __str__(self):
-        return (f"Treino: {self.nome}, Grupo Muscular: {self.grupo_muscular}, "
-                f"Dificuldade: {self.dificuldade}, Exercícios: {self.qnt_exercicios}, "
-                f"Matrícula: {self.matricula}")
+        return (f"Treino: {self.nome}, Grupo Muscular: {self.grupo_muscular}, Dificuldade: {self.dificuldade}, "
+                f"Exercícios: {self.qnt_exercicios}, Valor: R$ {self.valor}, CREF Responsável: {self.cref_responsavel}, "
+                f"Forma de Pagamento: {self.pagamento}")

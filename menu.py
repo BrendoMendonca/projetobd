@@ -69,9 +69,17 @@ def menu():
                 grupo_muscular = input("Grupo muscular: ")
                 dificuldade = input("Dificuldade: ")
                 qnt_exercicios = int(input("Quantidade de exercícios: "))
-                
+                valor = float(input(f"Custo do treino {nome_treino} R$ "))
+                cref_responsavel = input("CREF do personal responsável: ")
+                pagamento = input("Forma de pagamento: ")
+                """
+                torcedor = input("Torce para o Mengão: ").upper()
+                one_piece = input("Assite One Piece: ").upper()
+                sousa = input("É de Sousa: ").upper()
+                if(torcedor == one_piece == sousa == 'S'):
+                    valor*0.1"""
                 #cria uma instância de Treino passando os argumentos necessários
-                treino = Treino(nome_treino, grupo_muscular, dificuldade, qnt_exercicios, matricula)
+                treino = Treino(nome_treino, grupo_muscular, dificuldade, qnt_exercicios, matricula, valor, cref_responsavel, pagamento)
                 
                 treino.salvar_no_banco(aluno.id)  # Salva o treino no banco de dados
                 aluno.treinos.append(treino)

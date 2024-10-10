@@ -8,6 +8,7 @@ class SistemaCadastro:
         self.pessoas = []
         self.proximo_id = 1
         self.total_cadastradas = 0
+        self.carregar_do_banco()
         #self.treino = Treino()
         #self.progresso = Progresso(None, None, None)
         #self.progresso = Progresso()  # Instância da classe Progresso para gerenciar o progresso
@@ -158,5 +159,11 @@ class SistemaCadastro:
         for row in cursor.fetchall():
             aluno = Aluno(nome=row[1], telefone=row[2], sexo=row[3], matricula=row[4], altura=row[5], idade=row[6], peso=row[7], id=row[0])
             self.pessoas.append(aluno)
+        
+        cursor.execute("SELECT * FROM personais")
+        for row in cursor.fetchall():
+            personal = Personal(nome=row[1], telefone=row[2], sexo=row[3], cref=row[4])
+            personal.id = row[0]  # Definir o ID do personal
+            self.pessoas.append(personal)
 
         conn.close()
