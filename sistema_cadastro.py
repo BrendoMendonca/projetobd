@@ -2,6 +2,7 @@
 from usuarios import Aluno, Personal
 from treino_progresso import Progresso, Treino
 from database import conectar_banco
+from vendas import Produto
 
 class SistemaCadastro:
     def __init__(self):
@@ -150,6 +151,35 @@ class SistemaCadastro:
                 print(f"ID: {personal.id}, Nome: {personal.nome}, Sexo: {personal.sexo}, Telefone: {personal.telefone}, CREF: {personal.cref}")
         else:
             print("Nenhum personal cadastrado.")
+            
+    def relatorio_vendas():
+        conn = conectar_banco()
+        cursor = conn.cursor()
+
+        # Busca todas as vendas registradas
+        query = '''
+            SELECT c.id, a.nome AS aluno, p.nome AS personal, pr.nome AS produto, c.quantidade, pr.preco, c.forma_pagamento, c.data_compra
+            FROM compras c
+            JOIN alunos a ON c.aluno_id = a.id
+            JOIN personais p ON c.personal_id = p.id
+            JOIN produtos pr ON c.produto_id = pr.id
+            ORDER BY c.data_compra DESC;
+        '''
+        
+        cursor.execute(query)
+        vendas = cursor.fetchall()
+
+        conn.close()
+
+        if vendas:
+            print("\nRelatório de Vendas:")
+            for venda in vendas:
+                id_venda, aluno, personal, produto, quantidade, preco, forma_pagamento, data = venda
+                total = quantidade * preco
+                print(f"ID Venda: {id_venda} | Aluno: {aluno} | Personal: {personal} | Produto: {produto} | Quantidade: {quantidade} | Total: R$ {total:.2f} | Forma de Pagamento: {forma_pagamento} | Data: {data}")
+        else:
+            print("\nNenhuma venda registrada.")
+
 
     def carregar_do_banco(self):
         conn = conectar_banco()

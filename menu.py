@@ -2,6 +2,7 @@
 from sistema_cadastro import SistemaCadastro
 from usuarios import Aluno, Personal
 from treino_progresso import Progresso, Treino
+from vendas import Produto
 
 def menu():
     sistema = SistemaCadastro()
@@ -18,6 +19,8 @@ def menu():
         print("8. Listar treinos de aluno")
         print("9. Adicionar progresso a aluno")
         print("10. Listar progresso de aluno")
+        print("11. Buscar produto")
+        print("12. Fazer uma venda")
         print("0. Sair")
         opcao = input("\nEscolha uma opção: ")
 
@@ -121,9 +124,27 @@ def menu():
                 Progresso.listar_progresso(aluno) 
             else:
                 print(f"Aluno com matrícula {matricula} não encontrado.")
+        
+        elif opcao == '11':
+            nome = input("Nome do produto (opcional): ").upper()
+            preco_min = input("Preço mínimo (opcional): ").upper()
+            preco_max = input("Preço máximo (opcional): ").upper()
+            categoria = input("Categoria (garrafa/camisa) (opcional): ").upper()
+            cidade = input("Cidade de fabricação (opcional): ").upper()
+            
+            preco_min = float(preco_min) if preco_min else None
+            preco_max = float(preco_max) if preco_max else None
+            
+            Produto.buscar_produtos(nome=nome, preco_min=preco_min, preco_max=preco_max, categoria=categoria, cidade_fabricacao=cidade)            
 
+        elif opcao == '12':
+            aluno_matricula = input("Matrícula do aluno (comprador): ")
+            personal_cref = input("CREF do personal (vendedor): ")
+            Produto.registrar_compra_multiplos_produtos(aluno_matricula, personal_cref)
+            
         elif opcao == '0':
             sistema.relatorio_final()
+            SistemaCadastro.relatorio_vendas()
             print("Saindo do sistema.")
             break
 
