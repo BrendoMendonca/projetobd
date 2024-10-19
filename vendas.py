@@ -1,4 +1,6 @@
 from database import conectar_banco
+from decimal import Decimal
+
 
 class Produto:
     def __init__(self, nome, preco, categoria, cidade_fabricacao, estoque):
@@ -43,70 +45,21 @@ class Produto:
                 print(f"Nome: {produto[0]}, Preço: R$ {produto[1]}, Categoria: {produto[2]}, Cidade: {produto[3]}, Estoque: {produto[4]}")
         else:
             print("\nNenhum produto encontrado com os critérios informados.")
-
-
-
-    def registrar_compra(aluno_matricula, personal_cref, nome_produto, quantidade):
-        conn = conectar_banco()
-        cursor = conn.cursor()
-
-        # Verifica se o aluno existe
-        cursor.execute("SELECT id FROM alunos WHERE matricula = %s", (aluno_matricula,))
-        aluno = cursor.fetchone()
-
-        if not aluno:
-            print(f"Aluno com matrícula {aluno_matricula} não encontrado.")
-            conn.close()
-            return
-
-        # Verifica se o personal existe
-        cursor.execute("SELECT id FROM personais WHERE cref = %s", (personal_cref,))
-        personal = cursor.fetchone()
-
-        if not personal:
-            print(f"Personal com CREF {personal_cref} não encontrado.")
-            conn.close()
-            return
-
-        # Verifica se o produto existe e se há estoque suficiente
-        cursor.execute("SELECT id, estoque FROM produtos WHERE nome = %s", (nome_produto,))
-        produto = cursor.fetchone()
-
-        if not produto:
-            print(f"Produto {nome_produto} não encontrado.")
-            conn.close()
-            return
-        elif produto[1] < quantidade:
-            print(f"Estoque insuficiente. Apenas {produto[1]} unidades disponíveis para o produto {nome_produto}.")
-            conn.close()
-            return
-
-        # Registra a compra
-        cursor.execute('''INSERT INTO compras (aluno_id, personal_id, produto_id, quantidade, data_compra) 
-                        VALUES (%s, %s, %s, %s, NOW())''', 
-                        (aluno[0], personal[0], produto[0], quantidade))
-
-        # Atualiza o estoque do produto
-        cursor.execute("UPDATE produtos SET estoque = estoque - %s WHERE id = %s", (quantidade, produto[0]))
-
-        conn.commit()
-        conn.close()
-
-        print(f"Compra de {quantidade} unidades do produto {nome_produto} registrada com sucesso.")
     
     def registrar_compra_multiplos_produtos(aluno_matricula, personal_cref):
         conn = conectar_banco()
         cursor = conn.cursor()
 
         # Verifica se o aluno existe
-        cursor.execute("SELECT id FROM alunos WHERE matricula = %s", (aluno_matricula,))
+        cursor.execute("SELECT id, torcedor, assiste, sousa FROM alunos WHERE matricula = %s", (aluno_matricula,))
         aluno = cursor.fetchone()
 
         if not aluno:
             print(f"Aluno com matrícula {aluno_matricula} não encontrado.")
             conn.close()
             return
-
+        
+        
         # Verifica se o personal existe
         cursor.execute("SELECT id FROM personais WHERE cref = %s", (personal_cref,))
         personal = cursor.fetchone()
@@ -115,6 +68,9 @@ class Produto:
             print(f"Personal com CREF {personal_cref} não encontrado.")
             conn.close()
             return
+        
+        # Verifica se o aluno tem direito ao desconto
+        tem_desconto = aluno[1].lower() == 'flamengo' and aluno[2].lower() == 'one piece' and aluno[3]
 
         total_compra = 0
         produtos_comprados = []
@@ -138,10 +94,13 @@ class Produto:
             else:
                 # Calcula o valor total da compra
                 valor_produto = produto[1] * quantidade
+                if tem_desconto:
+                    valor_produto *=Decimal('0.9')
+                    print(f"\nDesconto de 10% aplicado")
                 total_compra += valor_produto
 
                 produtos_comprados.append((aluno[0], personal[0], produto[0], quantidade, valor_produto))
-                print(f"\n{quantidade} unidades do produto {nome_produto} foram adicionadas à compra, totalizando R$ {valor_produto:.2f}.\n")
+                print(f"\n{quantidade} unidade(s) do produto {nome_produto} foram adicionadas à compra, totalizando R$ {valor_produto:.2f}.\n")
 
         # Exibir valor total antes de finalizar a compra
         if produtos_comprados:

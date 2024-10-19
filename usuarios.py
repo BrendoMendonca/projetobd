@@ -12,12 +12,15 @@ class Pessoa:
         return f"ID: {self.id}, Nome: {self.nome}, Telefone: {self.telefone}, Sexo: {self.sexo}"
 
 class Aluno(Pessoa):
-    def __init__(self, nome, telefone, sexo, matricula, altura, idade, peso, id = None):
+    def __init__(self, nome, telefone, sexo, matricula, altura, idade, peso, torcedor='nenhum', assiste='nenhum', sousa=False, id=None):
         super().__init__(nome, telefone, sexo, id)
         self.matricula = matricula
         self.altura = altura
         self.idade = idade
         self.peso = peso
+        self.torcedor = torcedor
+        self.assiste = assiste
+        self.sousa = sousa
         self.imc = self.calcular_imc()
         self.treinos = []  # Inicializa a lista de treinos
         self.progresso = []  # Inicializa a lista de progresso 
@@ -36,18 +39,18 @@ class Aluno(Pessoa):
         cursor = conn.cursor()
 
         if self.id is None:
-            cursor.execute('''INSERT INTO alunos (nome, telefone, sexo, matricula, altura, idade, peso) 
-                              VALUES (%s, %s, %s, %s, %s, %s, %s)''',
-                           (self.nome, self.telefone, self.sexo, self.matricula, self.altura, self.idade, self.peso))
-            self.id = cursor.lastrowid  #atualiza o ID do objeto após inserção
+            cursor.execute('''INSERT INTO alunos (nome, telefone, sexo, matricula, altura, idade, peso, torcedor, assiste, sousa) 
+                              VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)''',
+                           (self.nome, self.telefone, self.sexo, self.matricula, self.altura, self.idade, self.peso, self.torcedor, self.assiste, self.sousa))
+            self.id = cursor.lastrowid
         else:
-            cursor.execute('''UPDATE alunos SET nome = %s, telefone = %s, sexo = %s, matricula = %s, altura = %s, idade = %s, peso = %s 
+            cursor.execute('''UPDATE alunos SET nome = %s, telefone = %s, sexo = %s, matricula = %s, altura = %s, idade = %s, peso = %s, torcedor = %s, assiste = %s, sousa = %s 
                               WHERE id = %s''',
-                           (self.nome, self.telefone, self.sexo, self.matricula, self.altura, self.idade, self.peso, self.id))
+                           (self.nome, self.telefone, self.sexo, self.matricula, self.altura, self.idade, self.peso, self.torcedor, self.assiste, self.sousa, self.id))
 
         conn.commit()
         conn.close()
-
+        
     def __str__(self):
         return (f"{super().__str__()}, Matrícula: {self.matricula}, Altura: {self.altura}m, "
                 f"Idade: {self.idade}, Peso: {self.peso}kg, IMC: {self.imc}")

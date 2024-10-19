@@ -4,6 +4,7 @@ from usuarios import Aluno, Personal
 from treino_progresso import Progresso, Treino
 from vendas import Produto
 
+
 def menu():
     sistema = SistemaCadastro()
 
@@ -35,7 +36,12 @@ def menu():
                 altura = float(input("Altura (em metros): "))
                 idade = int(input("Idade: "))
                 peso = float(input("Peso (em kg): "))
-                pessoa = Aluno(nome, telefone, sexo, matricula, altura, idade, peso)
+                
+                torcedor = input("Time de Futebol: ")
+                assiste = input("Série favorita: ")
+                sousa = input("É de Sousa? (S/N): ").strip().upper() == 'S'
+    
+                pessoa = Aluno(nome, telefone, sexo, matricula, altura, idade, peso, torcedor, assiste, sousa)
             elif tipo_pessoa == 'personal':
                 cref = input("CREF: ")
                 pessoa = Personal(nome, telefone, sexo, cref)
@@ -72,17 +78,9 @@ def menu():
                 grupo_muscular = input("Grupo muscular: ")
                 dificuldade = input("Dificuldade: ")
                 qnt_exercicios = int(input("Quantidade de exercícios: "))
-                valor = float(input(f"Custo do treino {nome_treino} R$ "))
-                cref_responsavel = input("CREF do personal responsável: ")
-                pagamento = input("Forma de pagamento: ")
-                """
-                torcedor = input("Torce para o Mengão: ").upper()
-                one_piece = input("Assite One Piece: ").upper()
-                sousa = input("É de Sousa: ").upper()
-                if(torcedor == one_piece == sousa == 'S'):
-                    valor*0.1"""
+               
                 #cria uma instância de Treino passando os argumentos necessários
-                treino = Treino(nome_treino, grupo_muscular, dificuldade, qnt_exercicios, matricula, valor, cref_responsavel, pagamento)
+                treino = Treino(nome_treino, grupo_muscular, dificuldade, qnt_exercicios, matricula)
                 
                 treino.salvar_no_banco(aluno.id)  # Salva o treino no banco de dados
                 aluno.treinos.append(treino)
