@@ -23,6 +23,7 @@ def menu():
         print("11. Buscar produto")
         print("12. Fazer uma venda")
         print("13. Verificar compras realizadas")
+        print("14. Consultar vendas (View)")
         print("0. Sair")
         opcao = input("\nEscolha uma opção: ")
 
@@ -153,6 +154,10 @@ def menu():
                 Produto.listar_compras(aluno)
             else:
                 print(f"Aluno com matrícula {matricula} não encontrado.")
+        
+        if opcao == '14':
+            Produto.consultar_view_vendas()
+
             
         elif opcao == '0':
             sistema.relatorio_final()
@@ -160,8 +165,8 @@ def menu():
             print("Saindo do sistema.")
             break
 
-        else:
-            print("Opção inválida, tente novamente.")
+        #else:
+         #   print("Opção inválida, tente novamente.")
 
 
 if __name__ == "__main__":

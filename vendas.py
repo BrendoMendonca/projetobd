@@ -1,5 +1,6 @@
 from database import conectar_banco
 from decimal import Decimal
+import mysql.connector
 
 
 class Produto:
@@ -180,3 +181,32 @@ class Produto:
                     print(f"   - Produto: {nome_produto}, Quantidade: {quantidade}, Total: R$ {valor_total:.2f}")
         else:
             print(f"\nNenhuma compra encontrada para o aluno {aluno.nome}.")
+    
+            
+    def consultar_view_vendas():
+        conn = conectar_banco()
+        cursor = conn.cursor()
+
+        query = "SELECT * FROM view_detalhes_vendas;"
+        cursor.execute(query)
+        vendas = cursor.fetchall()
+
+        conn.close()
+
+        if vendas:
+            print("\nDetalhes das Vendas:")
+            for venda in vendas:
+                id_venda = venda[0]
+                aluno = venda[1]
+                personal = venda[2]
+                produto = venda[3]
+                quantidade = venda[4]
+                preco = float(venda[5])  # Convertendo Decimal para float
+                valor_total = float(venda[6])  # Convertendo Decimal para float
+                data_compra = venda[7].strftime('%Y-%m-%d')  # Formatando a data como string
+                forma_pagamento = venda[8]
+
+                print(f"Código Venda: {id_venda} | Aluno: {aluno} | Personal: {personal} | Produto: {produto} | Quantidade: {quantidade} | Preço: R$ {preco:.2f} | Total: R$ {valor_total:.2f} | Data: {data_compra} | Forma de Pagamento: {forma_pagamento}")
+        else:
+            print("Nenhuma venda encontrada.")
+
