@@ -22,6 +22,7 @@ def menu():
         print("10. Listar progresso de aluno")
         print("11. Buscar produto")
         print("12. Fazer uma venda")
+        print("13. Verificar compras realizadas")
         print("0. Sair")
         opcao = input("\nEscolha uma opção: ")
 
@@ -129,16 +130,29 @@ def menu():
             preco_max = input("Preço máximo (opcional): ").upper()
             categoria = input("Categoria (garrafa/camisa) (opcional): ").upper()
             cidade = input("Cidade de fabricação (opcional): ").upper()
+            estoque_min = input("Quantidade mínima em estoque (opcional): ").upper()
+            estoque_max = input("Quantidade máxima em estoque (opcional): ").upper()
             
             preco_min = float(preco_min) if preco_min else None
             preco_max = float(preco_max) if preco_max else None
-            
-            Produto.buscar_produtos(nome=nome, preco_min=preco_min, preco_max=preco_max, categoria=categoria, cidade_fabricacao=cidade)            
+            estoque_min = int(estoque_min) if estoque_min else None
+            estoque_max = int(estoque_max) if estoque_max else None
+        
+            Produto.buscar_produtos(nome=nome, preco_min=preco_min, preco_max=preco_max, categoria=categoria, cidade_fabricacao=cidade, estoque_min=estoque_min, estoque_max=estoque_max)
 
         elif opcao == '12':
             aluno_matricula = input("Matrícula do aluno (comprador): ")
             personal_cref = input("CREF do personal (vendedor): ")
             Produto.registrar_compra_multiplos_produtos(aluno_matricula, personal_cref)
+        
+        elif opcao == '13':  # Verificar compras realizadas pelo aluno
+            matricula = input("Digite a matrícula do aluno para verificar as compras: ")
+            
+            aluno = next((p for p in sistema.pessoas if isinstance(p, Aluno) and p.matricula == matricula), None)
+            if aluno:
+                Produto.listar_compras(aluno)
+            else:
+                print(f"Aluno com matrícula {matricula} não encontrado.")
             
         elif opcao == '0':
             sistema.relatorio_final()

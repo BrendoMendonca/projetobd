@@ -156,16 +156,17 @@ class SistemaCadastro:
         conn = conectar_banco()
         cursor = conn.cursor()
 
-        # Busca todas as vendas registradas
+        # Consulta para buscar todas as vendas registradas
         query = '''
-            SELECT c.id, a.nome AS aluno, p.nome AS personal, pr.nome AS produto, c.quantidade, pr.preco, c.forma_pagamento, c.data_compra
+            SELECT c.id, a.nome AS aluno, p.nome AS personal, pr.nome AS produto, cp.quantidade, pr.preco, c.forma_pagamento, c.data_compra
             FROM compras c
             JOIN alunos a ON c.aluno_id = a.id
             JOIN personais p ON c.personal_id = p.id
-            JOIN produtos pr ON c.produto_id = pr.id
+            JOIN compras_produtos cp ON c.id = cp.compra_id
+            JOIN produtos pr ON cp.produto_id = pr.id
             ORDER BY c.data_compra DESC;
         '''
-        
+
         cursor.execute(query)
         vendas = cursor.fetchall()
 
@@ -179,7 +180,6 @@ class SistemaCadastro:
                 print(f"ID Venda: {id_venda} | Aluno: {aluno} | Personal: {personal} | Produto: {produto} | Quantidade: {quantidade} | Total: R$ {total:.2f} | Forma de Pagamento: {forma_pagamento} | Data: {data}")
         else:
             print("\nNenhuma venda registrada.")
-
 
     def carregar_do_banco(self):
         conn = conectar_banco()

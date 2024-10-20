@@ -11,7 +11,7 @@ class Produto:
         self.estoque = estoque
 
     @staticmethod
-    def buscar_produtos(nome=None, preco_min=None, preco_max=None, categoria=None, cidade_fabricacao=None):
+    def buscar_produtos(nome=None, preco_min=None, preco_max=None, categoria=None, cidade_fabricacao=None, estoque_min=None, estoque_max=None):
         conn = conectar_banco()
         cursor = conn.cursor()
 
@@ -33,6 +33,12 @@ class Produto:
         if cidade_fabricacao:
             query += " AND cidade_fabricacao = %s"
             params.append(cidade_fabricacao)
+        if estoque_min is not None:
+            query += " AND estoque >= %s"
+            params.append(estoque_min)
+        if estoque_max is not None:
+            query += " AND estoque <= %s"
+            params.append(estoque_max)
 
         cursor.execute(query, params)
         produtos = cursor.fetchall()
@@ -58,8 +64,7 @@ class Produto:
             print(f"Aluno com matrícula {aluno_matricula} não encontrado.")
             conn.close()
             return
-        
-        
+
         # Verifica se o personal existe
         cursor.execute("SELECT id FROM personais WHERE cref = %s", (personal_cref,))
         personal = cursor.fetchone()
@@ -68,14 +73,14 @@ class Produto:
             print(f"Personal com CREF {personal_cref} não encontrado.")
             conn.close()
             return
-        
-        # Verifica se o aluno tem direito ao desconto
-        tem_desconto = aluno[1].lower() == 'flamengo' and aluno[2].lower() == 'one piece' and aluno[3]
 
         total_compra = 0
         produtos_comprados = []
 
-        # Loop para adicionar vários produtos à compra
+        # Verifica se o aluno tem direito ao desconto
+        tem_desconto = aluno[1].lower() == 'flamengo' and aluno[2].lower() == 'one piece' and aluno[3]
+
+        # Coleta os produtos que o usuário deseja comprar
         while True:
             nome_produto = input("Nome do produto (ou digite 'sair' para finalizar): ")
             if nome_produto.lower() == 'sair':
@@ -92,29 +97,40 @@ class Produto:
             elif produto[2] < quantidade:
                 print(f"Estoque insuficiente. Apenas {produto[2]} unidades disponíveis para o produto {nome_produto}.")
             else:
-                # Calcula o valor total da compra
+                # Calcula o valor do produto e aplica o desconto, se aplicável
                 valor_produto = produto[1] * quantidade
                 if tem_desconto:
-                    valor_produto *=Decimal('0.9')
+                    valor_produto *= Decimal('0.9')  # Aplica o desconto de 10%.
                     print(f"\nDesconto de 10% aplicado")
                 total_compra += valor_produto
 
-                produtos_comprados.append((aluno[0], personal[0], produto[0], quantidade, valor_produto))
-                print(f"\n{quantidade} unidade(s) do produto {nome_produto} foram adicionadas à compra, totalizando R$ {valor_produto:.2f}.\n")
+                # Adiciona o produto à lista de produtos comprados
+                produtos_comprados.append((produto[0], quantidade, valor_produto))
+                print(f"\n{quantidade} unidades do produto {nome_produto} foram adicionadas à compra, totalizando R$ {valor_produto:.2f}.\n")
 
-        # Exibir valor total antes de finalizar a compra
+        # Verifica se há produtos para registrar na compra
         if produtos_comprados:
             print(f"\nO valor total da compra é: R$ {total_compra:.2f}")
             forma_pagamento = input("Informe a forma de pagamento (Cartão, Dinheiro, Pix): ")
 
-            # Registrar cada produto no banco de dados com a forma de pagamento
-            for compra in produtos_comprados:
-                cursor.execute('''INSERT INTO compras (aluno_id, personal_id, produto_id, quantidade, data_compra, forma_pagamento) 
-                                VALUES (%s, %s, %s, %s, NOW(), %s)''', 
-                                (compra[0], compra[1], compra[2], compra[3], forma_pagamento))
+            # Registrar uma única compra com a forma de pagamento
+            cursor.execute('''INSERT INTO compras (aluno_id, personal_id, data_compra, forma_pagamento) 
+                            VALUES (%s, %s, NOW(), %s)''', 
+                        (aluno[0], personal[0], forma_pagamento))
+
+            # Obtém o ID da compra que acabou de ser inserida
+            compra_id = cursor.lastrowid
+
+            # Agora insere cada produto com o mesmo ID de compra
+            for produto in produtos_comprados:
+                produto_id, quantidade, valor_produto = produto
+                cursor.execute('''INSERT INTO compras_produtos (compra_id, produto_id, quantidade, valor_total) 
+                                VALUES (%s, %s, %s, %s)''', 
+                                (compra_id, produto_id, quantidade, valor_produto))
+
 
                 # Atualiza o estoque do produto
-                cursor.execute("UPDATE produtos SET estoque = estoque - %s WHERE id = %s", (compra[3], compra[2]))
+                cursor.execute("UPDATE produtos SET estoque = estoque - %s WHERE id = %s", (quantidade, produto_id))
 
             conn.commit()
             conn.close()
@@ -122,3 +138,45 @@ class Produto:
             print("Compra registrada com sucesso!")
         else:
             print("Nenhum produto foi adicionado à compra.")
+
+
+            
+    @staticmethod
+    @staticmethod
+    def listar_compras(aluno):
+        conn = conectar_banco()
+        cursor = conn.cursor()
+
+        # Consulta para buscar todas as compras do aluno
+        query = '''
+            SELECT c.id, c.data_compra, c.forma_pagamento, SUM(cp.valor_total)
+            FROM compras c
+            JOIN compras_produtos cp ON c.id = cp.compra_id
+            WHERE c.aluno_id = %s
+            GROUP BY c.id
+            ORDER BY c.data_compra DESC;
+        '''
+
+        cursor.execute(query, (aluno.id,))
+        compras = cursor.fetchall()
+
+        if compras:
+            print(f"\nCompras realizadas pelo aluno {aluno.nome} - {aluno.matricula}:")
+            for compra in compras:
+                id_compra, data, forma_pagamento, total = compra
+                print(f"\nID Compra: {id_compra}, Data: {data}, Pagamento: {forma_pagamento}, Total: R$ {total:.2f}")
+                
+                # Agora buscar os produtos dessa compra
+                cursor.execute('''
+                    SELECT p.nome, cp.quantidade, cp.valor_total
+                    FROM compras_produtos cp
+                    JOIN produtos p ON cp.produto_id = p.id
+                    WHERE cp.compra_id = %s
+                ''', (id_compra,))
+                produtos = cursor.fetchall()
+
+                for produto in produtos:
+                    nome_produto, quantidade, valor_total = produto
+                    print(f"   - Produto: {nome_produto}, Quantidade: {quantidade}, Total: R$ {valor_total:.2f}")
+        else:
+            print(f"\nNenhuma compra encontrada para o aluno {aluno.nome}.")
