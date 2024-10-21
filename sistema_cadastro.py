@@ -15,7 +15,7 @@ class SistemaCadastro:
         #self.progresso = Progresso()  # Instância da classe Progresso para gerenciar o progresso
         #self.treino = Treino()  # Instância da classe Treino para gerenciar os treinos
 
-    def inserir(self, pessoa):
+    def inserir(self, pessoa):#método para inserir usuário
         
         self.pessoas.append(pessoa)
         pessoa.salvar_no_banco()
@@ -23,7 +23,7 @@ class SistemaCadastro:
         self.total_cadastradas += 1
         print(f"\nUsuário {pessoa.nome} inserido com sucesso!")
 
-    def alterar(self):
+    def alterar(self):#altera dados de usuário
         tipo_pessoa = input("Você quer alterar um aluno ou um personal? (Digite 'aluno' ou 'personal'): ").strip().lower()
         
         if tipo_pessoa == 'aluno':
@@ -56,7 +56,7 @@ class SistemaCadastro:
                     return
             print(f"\nPersonal com CREF {cref} não encontrado.")
 
-    def pesquisar(self, nome):
+    def pesquisar(self, nome):#pesquisa um usuário pelo nome
         usuario = False
         for pessoa in self.pessoas:
             if pessoa.nome == nome:
@@ -68,7 +68,7 @@ class SistemaCadastro:
         if not usuario:
             print(f"\nUsuário {nome} não encontrado.")
 
-    def remover(self):
+    def remover(self):#remove um usuário
         tipo_pessoa = input("Você quer remover um aluno ou um personal? (Digite 'aluno' ou 'personal'): ").strip().lower()
         
         if tipo_pessoa == 'aluno':
@@ -109,7 +109,7 @@ class SistemaCadastro:
                     return
             print(f"\nPersonal com CREF {cref} não encontrado.")
 
-    def listar_todos(self):
+    def listar_todos(self):#lista todos os usuários
         if not self.pessoas:
             print("\nNenhuma pessoa cadastrada.")
         else:
@@ -117,7 +117,7 @@ class SistemaCadastro:
             for pessoa in self.pessoas:
                 print(pessoa)
 
-    def exibir_um(self, id):
+    def exibir_um(self, id):#exibe um usuário
         for pessoa in self.pessoas:
             if pessoa.id == id:
                 print("\nDados do usuário:")
@@ -125,13 +125,13 @@ class SistemaCadastro:
                 return
         print(f"\nPessoa com id não encontrada.")
 
-    def validar_sexo(self, sexo):
+    def validar_sexo(self, sexo):#validação do sexo do usuário
         while sexo.upper() not in ['M', 'F']:
             print("Erro: Sexo inválido. Digite 'M' para Masculino ou 'F' para Feminino.")
             sexo = input("Sexo (M/F): ")
         return sexo.upper()
 
-    def relatorio_final(self):
+    def relatorio_final(self):#exibe o relatório de pessoas cadastradas
         alunos = [p for p in self.pessoas if isinstance(p, Aluno)]
         personais = [p for p in self.pessoas if isinstance(p, Personal)]
         
@@ -152,7 +152,7 @@ class SistemaCadastro:
         else:
             print("Nenhum personal cadastrado.")
             
-    def relatorio_vendas():
+    def relatorio_vendas():#exibe o relatório de vendas
         conn = conectar_banco()
         cursor = conn.cursor()
 
@@ -181,7 +181,7 @@ class SistemaCadastro:
         else:
             print("\nNenhuma venda registrada.")
 
-    def carregar_do_banco(self):
+    def carregar_do_banco(self):#recebe os dados do bd
         conn = conectar_banco()
         cursor = conn.cursor()
 

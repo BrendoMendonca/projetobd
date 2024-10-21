@@ -10,7 +10,7 @@ class Produto:
         self.categoria = categoria
         self.cidade_fabricacao = cidade_fabricacao
         self.estoque = estoque
-
+    #busca um produto por filtros
     @staticmethod
     def buscar_produtos(nome=None, preco_min=None, preco_max=None, categoria=None, cidade_fabricacao=None, estoque_min=None, estoque_max=None):
         conn = conectar_banco()
@@ -53,11 +53,11 @@ class Produto:
         else:
             print("\nNenhum produto encontrado com os critérios informados.")
     
-    def registrar_compra_multiplos_produtos(aluno_matricula, personal_cref):
+    def registrar_compra_multiplos_produtos(aluno_matricula, personal_cref):#faz uma venda
         conn = conectar_banco()
         cursor = conn.cursor()
 
-        # Verifica se o aluno existe
+        # verifica se o aluno existe
         cursor.execute("SELECT id, torcedor, assiste, sousa FROM alunos WHERE matricula = %s", (aluno_matricula,))
         aluno = cursor.fetchone()
 
@@ -66,7 +66,7 @@ class Produto:
             conn.close()
             return
 
-        # Verifica se o personal existe
+        # verifica se o personal existe
         cursor.execute("SELECT id FROM personais WHERE cref = %s", (personal_cref,))
         personal = cursor.fetchone()
 
@@ -78,10 +78,10 @@ class Produto:
         total_compra = 0
         produtos_comprados = []
 
-        # Verifica se o aluno tem direito ao desconto
+        # verifica se o aluno tem direito ao desconto
         tem_desconto = aluno[1].lower() == 'flamengo' and aluno[2].lower() == 'one piece' and aluno[3]
 
-        # Coleta os produtos que o usuário deseja comprar
+        # coleta os produtos que o usuário deseja comprar
         while True:
             nome_produto = input("Nome do produto (ou digite 'sair' para finalizar): ")
             if nome_produto.lower() == 'sair':
@@ -89,7 +89,7 @@ class Produto:
 
             quantidade = int(input("Quantidade a ser vendida: "))
 
-            # Verifica se o produto existe e se há estoque suficiente
+            # verifica se o produto existe e se há estoque suficiente
             cursor.execute("SELECT id, preco, estoque FROM produtos WHERE nome = %s", (nome_produto,))
             produto = cursor.fetchone()
 
@@ -98,31 +98,31 @@ class Produto:
             elif produto[2] < quantidade:
                 print(f"Estoque insuficiente. Apenas {produto[2]} unidades disponíveis para o produto {nome_produto}.")
             else:
-                # Calcula o valor do produto e aplica o desconto, se aplicável
+                # calcula o valor do produto e aplica o desconto, se aplicável
                 valor_produto = produto[1] * quantidade
                 if tem_desconto:
                     valor_produto *= Decimal('0.9')  # Aplica o desconto de 10%.
                     print(f"\nDesconto de 10% aplicado")
                 total_compra += valor_produto
 
-                # Adiciona o produto à lista de produtos comprados
+                # adiciona o produto à lista de produtos comprados
                 produtos_comprados.append((produto[0], quantidade, valor_produto))
                 print(f"\n{quantidade} unidades do produto {nome_produto} foram adicionadas à compra, totalizando R$ {valor_produto:.2f}.\n")
 
-        # Verifica se há produtos para registrar na compra
+        # verifica se há produtos para registrar na compra
         if produtos_comprados:
             print(f"\nO valor total da compra é: R$ {total_compra:.2f}")
             forma_pagamento = input("Informe a forma de pagamento (Cartão, Dinheiro, Pix): ")
 
-            # Registrar uma única compra com a forma de pagamento
+            # registrar uma única compra com a forma de pagamento
             cursor.execute('''INSERT INTO compras (aluno_id, personal_id, data_compra, forma_pagamento) 
                             VALUES (%s, %s, NOW(), %s)''', 
                         (aluno[0], personal[0], forma_pagamento))
 
-            # Obtém o ID da compra que acabou de ser inserida
+            # obtém o ID da compra que acabou de ser inserida
             compra_id = cursor.lastrowid
 
-            # Agora insere cada produto com o mesmo ID de compra
+            # agora insere cada produto com o mesmo ID de compra
             for produto in produtos_comprados:
                 produto_id, quantidade, valor_produto = produto
                 cursor.execute('''INSERT INTO compras_produtos (compra_id, produto_id, quantidade, valor_total) 
@@ -130,7 +130,7 @@ class Produto:
                                 (compra_id, produto_id, quantidade, valor_produto))
 
 
-                # Atualiza o estoque do produto
+                # atualiza o estoque do produto
                 cursor.execute("UPDATE produtos SET estoque = estoque - %s WHERE id = %s", (quantidade, produto_id))
 
             conn.commit()
@@ -148,7 +148,7 @@ class Produto:
         conn = conectar_banco()
         cursor = conn.cursor()
 
-        # Consulta para buscar todas as compras do aluno
+        # consulta para buscar todas as compras do aluno
         query = '''
             SELECT c.id, c.data_compra, c.forma_pagamento, SUM(cp.valor_total)
             FROM compras c
@@ -167,7 +167,7 @@ class Produto:
                 id_compra, data, forma_pagamento, total = compra
                 print(f"\nID Compra: {id_compra}, Data: {data}, Pagamento: {forma_pagamento}, Total: R$ {total:.2f}")
                 
-                # Agora buscar os produtos dessa compra
+                # busca os produtos dessa compra
                 cursor.execute('''
                     SELECT p.nome, cp.quantidade, cp.valor_total
                     FROM compras_produtos cp
@@ -183,7 +183,7 @@ class Produto:
             print(f"\nNenhuma compra encontrada para o aluno {aluno.nome}.")
     
             
-    def consultar_view_vendas():
+    def consultar_view_vendas():#consulta as vendas por view
         conn = conectar_banco()
         cursor = conn.cursor()
 

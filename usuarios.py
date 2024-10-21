@@ -11,7 +11,7 @@ class Pessoa:
     def __str__(self):
         return f"ID: {self.id}, Nome: {self.nome}, Telefone: {self.telefone}, Sexo: {self.sexo}"
 
-class Aluno(Pessoa):
+class Aluno(Pessoa):#cadastra um aluno
     def __init__(self, nome, telefone, sexo, matricula, altura, idade, peso, torcedor='nenhum', assiste='nenhum', sousa=False, id=None):
         super().__init__(nome, telefone, sexo, id)
         self.matricula = matricula
@@ -22,10 +22,10 @@ class Aluno(Pessoa):
         self.assiste = assiste
         self.sousa = sousa
         self.imc = self.calcular_imc()
-        self.treinos = []  # Inicializa a lista de treinos
-        self.progresso = []  # Inicializa a lista de progresso 
+        self.treinos = []  # inicializa a lista de treinos
+        self.progresso = []  # inicializa a lista de progresso 
     
-    def adicionar_progresso(self, progresso):
+    def adicionar_progresso(self, progresso):#adiciona um progresso associado ao aluno
         self.progresso.append(progresso)
         self.peso = progresso.peso
         self.imc = self.calcular_imc()
@@ -55,7 +55,7 @@ class Aluno(Pessoa):
         return (f"{super().__str__()}, Matrícula: {self.matricula}, Altura: {self.altura}m, "
                 f"Idade: {self.idade}, Peso: {self.peso}kg, IMC: {self.imc}")
 
-class Personal(Pessoa):
+class Personal(Pessoa):#cadastra um personal
     def __init__(self, nome, telefone, sexo, cref):
         super().__init__(nome, telefone, sexo, None)
         self.cref = cref

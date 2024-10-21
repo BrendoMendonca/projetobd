@@ -1,6 +1,6 @@
 
 import mysql.connector
-
+#faz a conecção com o banco de dados
 def conectar_banco():
     conn = mysql.connector.connect(
         host="localhost",  #endereço do servidor MySQL

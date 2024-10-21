@@ -7,7 +7,7 @@ from vendas import Produto
 
 def menu():
     sistema = SistemaCadastro()
-
+    #exibição do menu
     while True:
         print("\nMenu:")
         print("1. Inserir")
@@ -27,11 +27,12 @@ def menu():
         print("0. Sair")
         opcao = input("\nEscolha uma opção: ")
 
-        if opcao == '1':
+        #cadastramento de usuários
+        if opcao == '1': 
             nome = input("Nome: ")
             telefone = input("Telefone: ")
             sexo = sistema.validar_sexo(input("Sexo (M/F): "))
-
+            #verifica se é aluno ou personal
             tipo_pessoa = input("A pessoa é um aluno ou um personal? (Digite 'aluno' ou 'personal'): ").strip().lower()
             if tipo_pessoa == 'aluno':
                 matricula = input("Matrícula do Aluno: ")
@@ -53,22 +54,22 @@ def menu():
 
             sistema.inserir(pessoa)
 
-        elif opcao == '2':
+        elif opcao == '2': #altera o cadastro de um usuário
             #id = int(input("Digite o ID da pessoa a ser alterada: "))
             sistema.alterar()
 
-        elif opcao == '3':
+        elif opcao == '3':#pesquisa um usuário pelo nome
             nome = input("Digite o nome da pessoa a ser pesquisada: ")
             sistema.pesquisar(nome)
 
-        elif opcao == '4':
+        elif opcao == '4':#remove um usuário pelo ID
             #id = int(input("Digite o ID da pessoa a ser removida: "))
             sistema.remover()
 
-        elif opcao == '5':
+        elif opcao == '5':#exibe todos os usuários cadastrados
             sistema.listar_todos()
 
-        elif opcao == '6':
+        elif opcao == '6':#exibe um usuário pelo ID
             id = int(input("Digite o ID da pessoa a ser exibida: "))
             sistema.exibir_um(id)
 
@@ -84,7 +85,7 @@ def menu():
                 #cria uma instância de Treino passando os argumentos necessários
                 treino = Treino(nome_treino, grupo_muscular, dificuldade, qnt_exercicios, matricula)
                 
-                treino.salvar_no_banco(aluno.id)  # Salva o treino no banco de dados
+                treino.salvar_no_banco(aluno.id)  #salva o treino no banco de dados
                 aluno.treinos.append(treino)
                 
                 print("Treino adicionado com sucesso.")
@@ -99,7 +100,7 @@ def menu():
             else:
                 print(f"Aluno com matrícula {matricula} não encontrado.")
 
-        elif opcao == '9':
+        elif opcao == '9': #adiciona um progresso ao aluno
             matricula = input("Digite a matrícula do aluno para adicionar progresso: ")
             aluno = next((p for p in sistema.pessoas if isinstance(p, Aluno) and p.matricula == matricula), None)
             if aluno:
@@ -125,7 +126,7 @@ def menu():
             else:
                 print(f"Aluno com matrícula {matricula} não encontrado.")
         
-        elif opcao == '11':
+        elif opcao == '11': #faz a consulta de um produto
             nome = input("Nome do produto (opcional): ").upper()
             preco_min = input("Preço mínimo (opcional): ").upper()
             preco_max = input("Preço máximo (opcional): ").upper()
@@ -141,12 +142,12 @@ def menu():
         
             Produto.buscar_produtos(nome=nome, preco_min=preco_min, preco_max=preco_max, categoria=categoria, cidade_fabricacao=cidade, estoque_min=estoque_min, estoque_max=estoque_max)
 
-        elif opcao == '12':
+        elif opcao == '12': #faz uma venda
             aluno_matricula = input("Matrícula do aluno (comprador): ")
             personal_cref = input("CREF do personal (vendedor): ")
             Produto.registrar_compra_multiplos_produtos(aluno_matricula, personal_cref)
         
-        elif opcao == '13':  # Verificar compras realizadas pelo aluno
+        elif opcao == '13':  # verificar compras realizadas pelo aluno
             matricula = input("Digite a matrícula do aluno para verificar as compras: ")
             
             aluno = next((p for p in sistema.pessoas if isinstance(p, Aluno) and p.matricula == matricula), None)
@@ -155,7 +156,7 @@ def menu():
             else:
                 print(f"Aluno com matrícula {matricula} não encontrado.")
         
-        if opcao == '14':
+        if opcao == '14': #consulta um produto através de view
             Produto.consultar_view_vendas()
 
             
